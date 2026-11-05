@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kreditplus Onboarding</title>
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Onboarding">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+  html,body{margin:0;height:100%;background:#0b1220;overflow:hidden}
+  iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#0b1220;padding-top:env(safe-area-inset-top)}
+  #ld{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;color:#334155;font:15px system-ui,sans-serif;transition:opacity .3s}
+  #ld img{width:150px}
+  #ld.off{opacity:0;pointer-events:none}
+  #err{display:none;text-align:center;padding:0 24px}
+  #err a{color:#0ea5e9}
+</style>
+</head>
+<body>
+<iframe id="app" allow="camera; microphone; geolocation; fullscreen; clipboard-write" title="Kreditplus Onboarding"></iframe>
+<div id="ld"><img src="icons/icon-192.png" alt=""><div id="msg">Memuat aplikasi…</div>
+  <div id="err">Aplikasi lama merespons. <a id="direct" href="#">Buka langsung</a></div></div>
+<script>
+  // ====== ISI DENGAN URL /exec WEB APP ANDA ======
+  var APP_URL = "https://script.google.com/a/macros/finansia.com/s/AKfycbx37zJD2GuGqVkQK-k1KCpRDYUbDE8kCkvhp5NRHBElS0gaTDZJdZiihucGmlZ34NO8/exec";
+  // ===============================================
+  var f = document.getElementById('app'), ld = document.getElementById('ld');
+  function load(u){ f.src = u; document.getElementById('direct').href = u; ld.classList.remove('off'); clearTimeout(window._t); window._t = setTimeout(function(){document.getElementById('err').style.display='block';}, 15000); }
+  f.addEventListener('load', function(){ clearTimeout(window._t); ld.classList.add('off'); });
+  // Portal meminta pindah halaman (login -> portal, logout, dll.)
+  window.addEventListener('message', function(ev){
+    var d = ev.data;
+    if (!d || !d.kpNav || typeof d.kpNav !== 'string') return;
+    if (d.kpNav.indexOf(APP_URL) !== 0) return;          // hanya URL aplikasi sendiri
+    try { ev.source.postMessage({kpNavAck:true}, '*'); } catch(e){}
+    load(d.kpNav);
+  });
+  load(APP_URL);
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+</body>
+</html>
